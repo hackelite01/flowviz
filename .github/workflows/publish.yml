@@ -1,0 +1,81 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - "core@*"    # e.g. core@0.1.1
+      - "react@*"   # e.g. react@0.1.1
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to publish"
+        required: true
+        type: choice
+        options:
+          - core
+          - react
+          - both
+
+permissions:
+  contents: read
+  id-token: write   # Required for npm provenance / trusted publishers
+
+jobs:
+  # ─── Publish @flowviz/core ───────────────────────────────────────
+  publish-core:
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/core@'))
+      || (github.event_name == 'workflow_dispatch' && (github.event.inputs.package == 'core' || github.event.inputs.package == 'both'))
+    runs-on: ubuntu-latest
+    environment: npm          # must match the environment name on npmjs.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: core           # checkout the core branch
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci --prefix packages/core --ignore-scripts
+
+      - name: Build
+        run: npm run build --prefix packages/core
+
+      - name: Publish with provenance
+        run: npm publish --access public --provenance
+        working-directory: packages/core
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ─── Publish @flowviz/react ──────────────────────────────────────
+  publish-react:
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/react@'))
+      || (github.event_name == 'workflow_dispatch' && (github.event.inputs.package == 'react' || github.event.inputs.package == 'both'))
+    runs-on: ubuntu-latest
+    environment: npm
+    needs: []                 # runs in parallel unless you want core first
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: react          # checkout the react branch
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci --prefix packages/react --ignore-scripts
+
+      - name: Build
+        run: npm run build --prefix packages/react
+
+      - name: Publish with provenance
+        run: npm publish --access public --provenance
+        working-directory: packages/react
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
