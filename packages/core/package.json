@@ -1,9 +1,34 @@
 {
   "name": "@flowviz/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless, framework-agnostic, high-performance 2D flow visualization engine (Pure Canvas2D)",
   "author": "mayankrajput",
   "license": "MIT",
+  "keywords": [
+    "flow",
+    "visualization",
+    "canvas",
+    "particles",
+    "graph",
+    "animation",
+    "dag",
+    "directed-graph",
+    "data-pipeline",
+    "network-topology",
+    "cybersecurity",
+    "headless",
+    "2d",
+    "real-time"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hackelite01/flowviz.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/hackelite01/flowviz#readme",
+  "bugs": {
+    "url": "https://github.com/hackelite01/flowviz/issues"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -14,7 +39,7 @@
       "types":   "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md"],
   "sideEffects": false,
   "type": "module",
   "scripts": {
